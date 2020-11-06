@@ -1,3 +1,8 @@
+#
+# Aerospike Server Dockerfile
+#
+# http://github.com/aerospike/aerospike-server.docker
+#
 # This docker file is compatible with Aerospike Community Edition. It provides Java and Python environments and access to the Aerospike DB.
 FROM jupyter/base-notebook:python-3.8.6
 
@@ -27,18 +32,18 @@ RUN \
   && apt-get purge -y \
   && apt autoremove -y 
 
+COPY aerospike /etc/init.d/
 
 # Add the Aerospike configuration specific to this dockerfile
 COPY aerospike.template.conf /etc/aerospike/aerospike.template.conf
 RUN fix-permissions /etc/aerospike/
 
-COPY binder /home/${NB_USER}/notebooks/binder
-COPY python /home/${NB_USER}/notebooks/python
-COPY java /home/${NB_USER}/notebooks/java
-RUN fix-permissions /home/${NB_USER}/
+COPY notebooks* /home/${NB_USER}/notebooks
+COPY jupyter_notebook_config.py /home/${NB_USER}/
+RUN  fix-permissions /home/${NB_USER}/
 
 # I don't know why this has to be like this 
-# rather than overriding
+# rather than overiding
 COPY entrypoint.sh /usr/local/bin/start-notebook.sh
 
-WORKDIR /home/${NB_USER}/notebooks
+WORKDIR /home/${NB_USER}/notebooks  

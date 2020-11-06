@@ -20,25 +20,16 @@ export MEM_GB=${MEM_GB:-1}
 export DEFAULT_TTL=${DEFAULT_TTL:-30d}
 export STORAGE_GB=${STORAGE_GB:-4}
 export NSUP_PERIOD=${NSUP_PERIOD:-120}
-
+export USER=${USER:-jovyan}
+export MEMORY_SIZE=${MEMORY_SIZE:-128}
+export INDEX_STAGE_SIZE=${INDEX_STAGE_SIZE:-128}
 
 # Fill out conffile with above values
 if [ -f /etc/aerospike/aerospike.template.conf ]; then
         envsubst < /etc/aerospike/aerospike.template.conf > /etc/aerospike/aerospike.conf
 fi
-# set up license file for editing later
-#touch /etc/aerospike/features.conf
-#TODO: set to a+w later
-#chmod a+rw /etc/aerospike/features.conf
-
-# if command starts with an option, prepend asd
-if [ "${1:0:1}" = '-' ]; then
-	set -- asd "$@"
-fi
-
 
 NETLINK=${NETLINK:-eth0}
-
 
 # we will wait a bit for the network link to be up.
 NETLINK_UP=0
@@ -54,7 +45,6 @@ while [ $NETLINK_UP -eq 0 ] && [ $NETLINK_COUNT -lt 20 ]; do
 done
 echo "link $NETLINK state $(cat /sys/class/net/${NETLINK}/operstate) in ${NETLINK_COUNT}"
 
-asd
 
 #####
 # Jupiter stuff
@@ -73,5 +63,3 @@ elif [[ ! -z "${JUPYTER_ENABLE_LAB}" ]]; then
 else
   . /usr/local/bin/start.sh $wrapper jupyter notebook "$@"
 fi
-
-
